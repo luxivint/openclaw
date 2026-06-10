@@ -13,7 +13,6 @@ services:
       OPENCLAW_CONFIG_DIR: /home/node/.openclaw
       OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
       OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
-      OPENCLAW_GATEWAY_BIND: lan
       OPENCLAW_DISABLE_BONJOUR: "1"
       OPENCLAW_TZ: Europe/Istanbul
       TZ: Europe/Istanbul
@@ -23,7 +22,6 @@ services:
       - openclaw_state:/home/node/.openclaw
       - openclaw_workspace:/home/node/.openclaw/workspace
       - openclaw_auth:/home/node/.config/openclaw
-      - ./openclaw.config.json:/home/node/.openclaw/openclaw.json:ro
 
     expose:
       - "18789"
@@ -40,13 +38,43 @@ services:
       - no-new-privileges:true
 
     command:
-      - node
-      - dist/index.js
-      - gateway
-      - --bind
-      - lan
-      - --port
-      - "18789"
+      - sh
+      - -lc
+      - |
+        mkdir -p /home/node/.openclaw /home/node/.openclaw/workspace /home/node/.config/openclaw
+
+        cat > /home/node/.openclaw/openclaw.json <<'EOF'
+        {
+          "gateway": {
+            "mode": "local",
+            "bind": "lan",
+            "port": 18789,
+            "auth": {
+              "mode": "token",
+              "token": "${OPENCLAW_GATEWAY_TOKEN}"
+            },
+            "trustedProxies": [
+              "10.0.1.49"
+            ],
+            "controlUi": {
+              "enabled": true,
+              "allowedOrigins": [
+                "http://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
+                "https://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
+                "http://localhost:5173",
+                "http://localhost:18789",
+                "http://127.0.0.1:18789"
+              ]
+            }
+          }
+        }
+        EOF
+
+        echo "=== OpenClaw config ==="
+        cat /home/node/.openclaw/openclaw.json
+        echo "======================="
+
+        node dist/index.js gateway --bind lan --port 18789
 
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
