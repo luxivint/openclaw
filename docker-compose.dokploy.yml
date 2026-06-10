@@ -73,8 +73,10 @@ services:
             "controlUi": {
               "enabled": true,
               "allowedOrigins": [
-                "http://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
-                "https://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
+                "https://shiftlen.com",
+                "http://shiftlen.com",
+                "https://www.shiftlen.com",
+                "http://www.shiftlen.com",
                 "http://localhost:5173",
                 "http://localhost:18789",
                 "http://127.0.0.1:18789"
@@ -84,9 +86,7 @@ services:
         }
         EOF
 
-        echo "=== OpenClaw config ==="
-        cat /home/node/.openclaw/openclaw.json
-        echo "======================="
+        echo "=== OpenClaw config written ==="
 
         node dist/index.js gateway --bind lan --port 18789
 
