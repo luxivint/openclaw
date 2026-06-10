@@ -3,12 +3,16 @@
     "mode": "local",
     "bind": "lan",
     "port": 18789,
+    "trustedProxies": [
+      "10.0.1.49"
+    ],
     "auth": {
       "mode": "token"
     },
     "controlUi": {
       "enabled": true,
       "allowedOrigins": [
+        "http://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
         "https://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
         "http://localhost:18789",
         "http://127.0.0.1:18789"
