@@ -23,6 +23,7 @@ services:
       - openclaw_state:/home/node/.openclaw
       - openclaw_workspace:/home/node/.openclaw/workspace
       - openclaw_auth:/home/node/.config/openclaw
+      - ./openclaw.config.json:/home/node/.openclaw/openclaw.json:ro
 
     expose:
       - "18789"
@@ -46,7 +47,6 @@ services:
       - lan
       - --port
       - "18789"
-      - --allow-unconfigured
 
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
