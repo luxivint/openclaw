@@ -4,6 +4,7 @@ services:
     container_name: openclaw-gateway
     restart: unless-stopped
     init: true
+    user: "0:0"
 
     environment:
       HOME: /home/node
@@ -41,9 +42,19 @@ services:
       - sh
       - -lc
       - |
-        mkdir -p /home/node/.openclaw /home/node/.openclaw/workspace /home/node/.config/openclaw
+        set -e
 
-        cat > /home/node/.openclaw/openclaw.json <<'EOF'
+        mkdir -p /home/node/.openclaw
+        mkdir -p /home/node/.openclaw/workspace
+        mkdir -p /home/node/.openclaw/logs
+        mkdir -p /home/node/.config/openclaw
+
+        chmod -R 777 /home/node/.openclaw || true
+        chmod -R 777 /home/node/.config/openclaw || true
+
+        rm -f /home/node/.openclaw/openclaw.json || true
+
+        cat > /home/node/.openclaw/openclaw.json <<EOF
         {
           "gateway": {
             "mode": "local",
@@ -54,7 +65,10 @@ services:
               "token": "${OPENCLAW_GATEWAY_TOKEN}"
             },
             "trustedProxies": [
-              "10.0.1.49"
+              "10.0.1.49",
+              "10.0.0.0/8",
+              "172.16.0.0/12",
+              "192.168.0.0/16"
             ],
             "controlUi": {
               "enabled": true,
