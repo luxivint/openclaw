@@ -1,0 +1,60 @@
+services:
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    init: true
+
+    environment:
+      HOME: /home/node
+      OPENCLAW_HOME: /home/node
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+      OPENCLAW_GATEWAY_BIND: lan
+      OPENCLAW_DISABLE_BONJOUR: "1"
+      OPENCLAW_TZ: Europe/Istanbul
+      TZ: Europe/Istanbul
+      TERM: xterm-256color
+
+    volumes:
+      - openclaw_state:/home/node/.openclaw
+      - openclaw_workspace:/home/node/.openclaw/workspace
+      - openclaw_auth:/home/node/.config/openclaw
+
+    expose:
+      - "18789"
+      - "18790"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+
+    security_opt:
+      - no-new-privileges:true
+
+    command:
+      - node
+      - dist/index.js
+      - gateway
+      - --bind
+      - lan
+      - --port
+      - "18789"
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  openclaw_state:
+  openclaw_workspace:
+  openclaw_auth:
