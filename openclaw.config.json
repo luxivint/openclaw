@@ -1,0 +1,18 @@
+{
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "port": 18789,
+    "auth": {
+      "mode": "token"
+    },
+    "controlUi": {
+      "enabled": true,
+      "allowedOrigins": [
+        "https://openclow-op-l946ya-ae977f-78-135-85-119.traefik.me",
+        "http://localhost:18789",
+        "http://127.0.0.1:18789"
+      ]
+    }
+  }
+}
